@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Solar 3D</title>
+  <meta name="description" content="Sistema Solar em 3D com as posições dos planetas calculadas para a data, escala real das distâncias e simulação de eclipse." />
+  <link rel="stylesheet" href="style.css?v=20261120d" />
+</head>
+<body>
+  <div id="app"></div>
+  <div id="vignette"></div>
+
+  <header id="header">
+    <h1>Sistema Solar 3D</h1>
+    <p id="tel-target"></p>
+    <div id="player" role="group" aria-label="Tempo da simulação">
+      <button class="btn btn-icon" id="time-slow" title="Mais devagar" aria-label="Mais devagar">«</button>
+      <button class="btn btn-icon" id="time-play" title="Pausar / continuar (Espaço)" aria-label="Pausar ou continuar">❚❚</button>
+      <button class="btn btn-icon" id="time-fast" title="Mais rápido" aria-label="Mais rápido">»</button>
+      <div id="time-info">
+        <button id="sim-date" title="Voltar para hoje"></button>
+        <span id="time-speed"></span>
+      </div>
+    </div>
+    <p id="scale-note" hidden>Distâncias em escala real. Os tamanhos dos planetas continuam ampliados, senão eles seriam invisíveis.</p>
+  </header>
+
+  <nav id="actions" aria-label="Ferramentas">
+    <button class="btn" id="btn-eclipse" title="Simular um eclipse solar total visto da Terra">
+      <span class="lbl">Eclipse</span>
+    </button>
+    <button class="btn" id="btn-overview" title="Voltar à visão geral (Esc)">
+      <span class="lbl">Visão geral</span>
+    </button>
+    <button class="btn" id="btn-scale" title="Mostrar as distâncias na proporção real">
+      <span class="lbl">Escala real</span>
+    </button>
+    <button class="btn active" id="btn-orbits" title="Mostrar ou ocultar as órbitas">
+      <span class="lbl">Órbitas</span>
+    </button>
+    <button class="btn" id="btn-labels" title="Mostrar ou ocultar os nomes">
+      <span class="lbl">Nomes</span>
+    </button>
+    <button class="btn" id="btn-sound" title="Ligar ou desligar o som ambiente">
+      <span class="lbl">Som: Off</span>
+    </button>
+    <span class="sep"></span>
+    <div class="btn-group">
+      <button class="btn btn-icon" id="zoom-out" title="Afastar (−)" aria-label="Afastar">−</button>
+      <button class="btn btn-icon" id="zoom-in" title="Aproximar (+)" aria-label="Aproximar">+</button>
+    </div>
+  </nav>
+
+
+  <div id="dock" role="navigation" aria-label="Escolher astro"></div>
+
+  <section id="eclipse-hud" hidden>
+    <div class="eclipse-top">
+      <div id="eclipse-phase" class="eclipse-badge"></div>
+      <div class="eclipse-metrics">Sol coberto: <b id="ec-obsc">0%</b></div>
+    </div>
+    <p id="eclipse-desc"></p>
+    <div class="eclipse-timeline">
+      <input type="range" id="eclipse-slider" min="0" max="1" step="0.001" value="0" aria-label="Andamento do eclipse" />
+      <div class="timeline-labels">
+        <span>Início</span>
+        <span class="totality-lbl">Totalidade</span>
+        <span>Fim</span>
+      </div>
+    </div>
+    <div class="eclipse-actions">
+      <button class="btn" id="btn-eclipse-pause">Pausar</button>
+      <button class="btn" id="btn-eclipse-totality">Ir para a totalidade</button>
+      <button class="btn" id="btn-eclipse-exit">Sair</button>
+    </div>
+  </section>
+
+  <div id="fade"></div>
+
+  <div id="tooltip"><span id="tooltip-name"></span><small>clique para ver os dados</small></div>
+
+  <aside id="panel" aria-live="polite">
+    <div id="panel-head">
+      <span id="panel-dot"></span>
+      <div>
+        <div id="panel-name"></div>
+        <div id="panel-type"></div>
+      </div>
+      <button id="panel-close" title="Fechar (Esc)" aria-label="Fechar">✕</button>
+    </div>
+    <ul id="panel-facts"></ul>
+    <div id="panel-desc"></div>
+  </aside>
+
+  <p id="credits">Texturas: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (CC BY 4.0)</p>
+
+  <div id="loading">
+    <div class="ring"></div>
+    <span>Carregando…</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="app.js?v=20261120d"></script>
+</body>
+</html>

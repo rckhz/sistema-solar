@@ -1,0 +1,244 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --line: rgba(160, 185, 235, 0.16);
+  --panel: rgba(8, 12, 24, 0.82);
+  --text: #eef2ff;
+  --muted: #8e9bb8;
+  --accent: #f4b659;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  background: #03050c;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  user-select: none;
+}
+
+#app { position: fixed; inset: 0; z-index: 1; }
+#app canvas { display: block; cursor: grab; touch-action: none; }
+#app canvas:active { cursor: grabbing; }
+
+#vignette {
+  position: fixed; inset: 0; z-index: 5; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 58%, rgba(0, 2, 10, 0.55) 100%);
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ---------- Cabeçalho ---------- */
+#header {
+  position: fixed; top: 18px; left: 22px; z-index: 20; pointer-events: none;
+  max-width: 300px;
+}
+#header h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+#tel-target { margin-top: 3px; font-size: 12px; color: var(--muted); }
+#scale-note { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--accent); }
+#scale-note[hidden] { display: none; }
+
+/* ---------- Barra de ferramentas ---------- */
+#actions {
+  position: fixed; top: 18px; right: 22px; z-index: 20;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn {
+  height: 34px; padding: 0 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  color: var(--text); font: inherit; font-size: 12.5px; font-weight: 500;
+  cursor: pointer; backdrop-filter: blur(12px);
+  transition: background 0.18s, border-color 0.18s, transform 0.1s;
+}
+.btn:hover { background: rgba(32, 44, 78, 0.88); border-color: rgba(175, 200, 250, 0.38); }
+.btn:active { transform: translateY(1px); }
+.btn.active { background: rgba(32, 44, 78, 0.88); border-color: rgba(175, 200, 250, 0.32); }
+.btn-icon { width: 34px; padding: 0; font-size: 15px; }
+.btn-group { display: inline-flex; }
+.btn-group .btn { border-radius: 0; }
+.btn-group .btn:first-child { border-radius: 8px 0 0 8px; }
+.btn-group .btn:last-child { border-radius: 0 8px 8px 0; }
+.btn-group .btn + .btn { border-left: none; }
+#actions .sep { width: 1px; height: 20px; background: var(--line); margin: 0 3px; }
+
+/* ---------- Tempo ---------- */
+#player {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px; pointer-events: auto;
+}
+#time-info { display: flex; flex-direction: column; margin-left: 4px; min-width: 92px; }
+#sim-date {
+  background: none; border: none; padding: 0; text-align: left; cursor: pointer;
+  color: var(--text); font: inherit; font-size: 13px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+#sim-date:hover { color: var(--accent); }
+#time-speed { font-size: 11px; color: var(--muted); }
+
+/* ---------- Dock de astros ---------- */
+#dock {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: center; gap: 5px;
+  background: var(--panel); border: 1px solid var(--line);
+  padding: 5px 7px; border-radius: 12px; backdrop-filter: blur(14px);
+  max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none;
+}
+#dock::-webkit-scrollbar { display: none; }
+.dock-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 8px; border: 1px solid transparent;
+  background: transparent; color: var(--muted); font: inherit; font-size: 12px;
+  cursor: pointer; white-space: nowrap; transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.dock-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.dock-btn.active {
+  color: var(--text); background: rgba(244, 182, 89, 0.14);
+  border-color: rgba(244, 182, 89, 0.45);
+}
+.dock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ---------- Tooltip ---------- */
+#tooltip {
+  position: fixed; z-index: 30; pointer-events: none; display: none;
+  background: rgba(8, 12, 28, 0.9); border: 1px solid rgba(160, 195, 255, 0.4);
+  padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  transform: translate(14px, -50%); white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+#tooltip small { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+
+/* ---------- Painel de informações ---------- */
+#panel {
+  position: fixed; right: 22px; bottom: 78px; z-index: 25;
+  width: 360px; max-width: calc(100vw - 44px);
+  max-height: calc(100vh - 150px); overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px 20px; backdrop-filter: blur(16px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+  transform: translateY(calc(100% + 90px));
+  transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.38s;
+  pointer-events: none;
+}
+#panel.open { transform: translateY(0); pointer-events: auto; }
+#panel:not(.open) { visibility: hidden; }
+#panel-head { display: flex; align-items: center; gap: 10px; }
+#panel-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 10px currentColor; }
+#panel-name { font-size: 18px; font-weight: 600; line-height: 1.2; }
+#panel-type { font-size: 12px; color: var(--muted); margin-top: 2px; }
+#panel-close {
+  margin-left: auto; background: none; border: none; color: var(--muted);
+  font-size: 17px; cursor: pointer; padding: 4px 7px; border-radius: 6px;
+}
+#panel-close:hover { color: var(--text); background: rgba(255, 255, 255, 0.08); }
+#panel-facts {
+  list-style: none; margin: 15px 0; display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--line); border-left: 1px solid var(--line);
+}
+#panel-facts li { padding: 8px 11px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+#panel-facts li:last-child:nth-child(odd) { grid-column: span 2; }
+#panel-facts span { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+#panel-facts b { display: block; margin-top: 2px; font-weight: 600; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+#panel-facts b span { font-size: inherit; color: inherit; text-transform: none; letter-spacing: normal; display: inline; }
+#panel-desc { font-size: 13px; line-height: 1.6; color: var(--muted); user-select: text; }
+
+/* ---------- Eclipse ---------- */
+#eclipse-hud {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 35;
+  width: min(600px, calc(100vw - 32px)); padding: 12px 16px 12px;
+  background: rgba(8, 12, 24, 0.72); border: 1px solid var(--line);
+  border-radius: 10px; backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+#eclipse-hud[hidden] { display: none; }
+.eclipse-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.eclipse-badge { font-size: 14px; font-weight: 600; }
+.eclipse-metrics { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.eclipse-metrics b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+#eclipse-desc { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted); min-height: 2.9em; }
+.eclipse-timeline { margin: 8px 0 10px; }
+.timeline-labels {
+  display: flex; justify-content: space-between; font-size: 11px; color: var(--muted);
+  margin-top: 2px;
+}
+.totality-lbl { color: var(--text); font-weight: 500; }
+#eclipse-slider { width: 100%; accent-color: #9fb0d8; cursor: pointer; }
+.eclipse-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.eclipse-actions .btn { height: 30px; font-size: 12px; }
+#btn-eclipse-exit { margin-left: auto; }
+
+/* Durante o eclipse visto do chão: sem vinheta e sem controle de tempo */
+#vignette { transition: opacity 0.4s; }
+body.eclipse-on #vignette { opacity: 0; }
+body.eclipse-on #player { display: none; }
+
+#fade {
+  position: fixed; inset: 0; z-index: 30; pointer-events: none;
+  background: #000; opacity: 0;
+}
+
+/* ---------- Créditos ---------- */
+#credits {
+  position: fixed; left: 22px; bottom: 26px; z-index: 15;
+  font-size: 10.5px; color: rgba(142, 155, 184, 0.7);
+}
+#credits a { color: inherit; }
+#credits a:hover { color: var(--text); }
+
+/* ---------- Carregamento ---------- */
+#loading {
+  position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  background: #040711; transition: opacity 0.45s; font-size: 13px; color: var(--muted);
+  pointer-events: none;
+}
+#loading .ring {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--line); border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Telas médias: créditos sobem para não bater no dock ---------- */
+@media (max-width: 1180px) {
+  #credits { bottom: auto; top: 64px; left: auto; right: 22px; }
+}
+
+/* ---------- Telas baixas (celular deitado) ---------- */
+@media (max-height: 560px) {
+  #eclipse-desc { display: none; }
+  #eclipse-hud { padding: 8px 12px; bottom: 10px; }
+  .eclipse-timeline { margin: 6px 0 8px; }
+  #panel { bottom: 64px; max-height: calc(100vh - 64px - 76px); }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 780px) {
+  #header { top: 12px; left: 12px; right: 12px; max-width: none; }
+  #actions {
+    top: auto; bottom: 66px; left: 12px; right: 12px;
+    flex-wrap: wrap; justify-content: center; gap: 5px;
+  }
+  .btn { height: 32px; padding: 0 10px; font-size: 12px; }
+  .btn-icon { width: 32px; padding: 0; }
+  #actions .sep { display: none; }
+  #dock {
+    bottom: 12px;
+    /* indica que a lista continua para o lado */
+    -webkit-mask-image: linear-gradient(to right, #000 82%, transparent);
+    mask-image: linear-gradient(to right, #000 82%, transparent);
+  }
+  #credits { top: 20px; right: 12px; font-size: 9.5px; }
+  #panel {
+    left: 12px; right: 12px; bottom: 12px; width: auto; max-width: none;
+    max-height: 62vh; z-index: 40;
+  }
+  #eclipse-hud { bottom: 12px; padding: 10px 12px; }
+  body.eclipse-on #actions { display: none; }
+  .eclipse-top { flex-direction: column; gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #panel { transition: none; }
+  #loading .ring { animation: none; }
+}
