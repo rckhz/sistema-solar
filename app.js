@@ -712,6 +712,7 @@ const pointer = new THREE.Vector2();
 const tooltip = document.getElementById('tooltip');
 const panel = document.getElementById('panel');
 const telTarget = document.getElementById('tel-target');
+const intro = document.getElementById('intro');
 const HINT = 'Clique em um planeta para ver os dados';
 
 let dragStart = null;
@@ -889,9 +890,19 @@ function currentDist() {
 }
 function zoomBy(factor) { zoomTo(currentDist() * factor); }
 
+function updateIntro() {
+  const overviewDistance = Math.hypot(52, 122) * Math.min(1, camera.aspect / 0.9);
+  const visible = !realScale && scaleK === 0 && !eclipse && !followPlanet && !viewAnim
+    && controls.target.lengthSq() < 1 && currentDist() >= overviewDistance * 0.47;
+  if (intro.classList.contains('is-visible') === visible) return;
+  intro.classList.toggle('is-visible', visible);
+  intro.setAttribute('aria-hidden', String(!visible));
+}
+
 renderer.domElement.addEventListener('wheel', (e) => {
   e.preventDefault();
-  zoomBy(1 + e.deltaY * 0.0028);
+  const sensitivity = !realScale && e.deltaY > 0 ? 0.0014 : 0.0028;
+  zoomBy(1 + e.deltaY * sensitivity);
 }, { passive: false });
 
 function touchGap(t) {
@@ -918,6 +929,7 @@ document.getElementById('zoom-out').addEventListener('click', () => zoomBy(1.33)
 function goOverview() {
   if (eclipse) { endEclipse(true); return; }
   deselect();
+  wheelDist = null;
   flyTo(overviewCam(), new THREE.Vector3(0, 0, 0), 1.2);
 }
 document.getElementById('btn-overview').addEventListener('click', goOverview);
@@ -943,20 +955,27 @@ document.getElementById('btn-labels').addEventListener('click', () => {
 const scaleBtn = document.getElementById('btn-scale');
 const scaleNote = document.getElementById('scale-note');
 function setRealScale(on, animated = true) {
-  if (eclipse || on === realScale) return;
+  const targetScale = on ? 1 : 0;
+  if (eclipse || (on === realScale && (animated || scaleK === targetScale))) return;
   realScale = on;
   scaleBtn.classList.toggle('active', on);
   scaleNote.hidden = !on;
   controls.maxDistance = on ? 1400 : 320;
   if (on && !labelsVisible) setLabels(true);   // de longe os planetas viram pontos; os nomes ajudam
-  if (animated) scaleAnim = { from: scaleK, to: on ? 1 : 0, t: 0, dur: 2.2 };
-  else { scaleK = on ? 1 : 0; updatePositions(); }
+  if (animated) scaleAnim = { from: scaleK, to: targetScale, t: 0, dur: 2.2 };
+  else { scaleAnim = null; scaleK = targetScale; updatePositions(); }
   if (!followPlanet) {
     flyTo(overviewCam(), new THREE.Vector3(0, 0, 0), animated ? 2.2 : 0.01);
     setHash(on ? 'escala-real' : '');
   }
 }
 scaleBtn.addEventListener('click', () => setRealScale(!realScale));
+
+document.getElementById('btn-home').addEventListener('click', () => {
+  if (eclipse) endEclipse(false);
+  setRealScale(false, false);
+  goOverview();
+});
 
 document.getElementById('panel-close').addEventListener('click', deselect);
 
@@ -1659,6 +1678,7 @@ function animate() {
   }
 
   if (!eclipseView) controls.update();
+  updateIntro();
   renderer.render(eclipseView ? eScene : scene, eclipseView ? eCam : camera);
 
   if (loadingEl) {

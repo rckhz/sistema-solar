@@ -29,12 +29,59 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
 
+/* ---------- Abertura da visão geral ---------- */
+#intro {
+  position: fixed;
+  top: 47%;
+  left: clamp(22px, 7vw, 112px);
+  z-index: 10;
+  width: min(490px, 44vw);
+  transform: translateY(-50%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0.35s;
+  text-shadow: 0 2px 16px #03050c, 0 0 32px #03050c;
+}
+#intro.is-visible { opacity: 1; visibility: visible; }
+#intro h1 {
+  font-size: clamp(32px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+#intro h1 span { color: var(--accent); }
+.intro-summary {
+  max-width: 34ch;
+  margin-top: 14px;
+  color: #d7def0;
+  font-size: clamp(14px, 1.4vw, 18px);
+  line-height: 1.5;
+}
+.intro-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: #aebbd4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.intro-hint > [aria-hidden] { color: var(--accent); font-size: 16px; }
+.intro-touch { display: none; }
+@media (pointer: coarse) {
+  .intro-mouse, .intro-hint > [aria-hidden] { display: none; }
+  .intro-touch { display: inline; }
+}
+
 /* ---------- Cabeçalho ---------- */
 #header {
   position: fixed; top: 18px; left: 22px; z-index: 20; pointer-events: none;
   max-width: 300px;
 }
-#header h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+.app-title { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+#intro.is-visible ~ #header .app-title { visibility: hidden; }
 #tel-target { margin-top: 3px; font-size: 12px; color: var(--muted); }
 #scale-note { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--accent); }
 #scale-note[hidden] { display: none; }
@@ -214,6 +261,15 @@ body.eclipse-on #player { display: none; }
 
 /* ---------- Celular ---------- */
 @media (max-width: 780px) {
+  #intro {
+    top: 19%;
+    left: 22px;
+    width: min(420px, calc(100vw - 44px));
+    transform: none;
+  }
+  #intro h1 { font-size: clamp(30px, 7.5vw, 52px); }
+  .intro-summary { margin-top: 10px; }
+  .intro-hint { margin-top: 12px; }
   #header { top: 12px; left: 12px; right: 12px; max-width: none; }
   #actions {
     top: auto; bottom: 66px; left: 12px; right: 12px;
@@ -238,7 +294,12 @@ body.eclipse-on #player { display: none; }
   .eclipse-top { flex-direction: column; gap: 2px; }
 }
 
+@media (max-width: 780px) and (max-height: 440px) {
+  #intro { top: 30%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  #intro { transition: none; }
   #panel { transition: none; }
   #loading .ring { animation: none; }
 }

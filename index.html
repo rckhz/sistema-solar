@@ -5,14 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema Solar 3D</title>
   <meta name="description" content="Sistema Solar em 3D com as posições dos planetas calculadas para a data, escala real das distâncias e simulação de eclipse." />
-  <link rel="stylesheet" href="style.css?v=20261120d" />
+  <link rel="stylesheet" href="style.css?v=20261123" />
 </head>
 <body>
   <div id="app"></div>
   <div id="vignette"></div>
 
+  <section id="intro" aria-labelledby="intro-title" aria-hidden="true">
+    <h1 id="intro-title">Sistema Solar <span>3D</span></h1>
+    <p class="intro-summary">Explore o Sistema Solar, acompanhe os planetas em suas órbitas e veja um eclipse da superfície da Terra.</p>
+    <p class="intro-hint"><span aria-hidden="true">↑</span> <span class="intro-mouse">Role a roda do mouse para cima para se aproximar dos planetas.</span><span class="intro-touch">Afaste dois dedos para se aproximar dos planetas.</span></p>
+  </section>
+
   <header id="header">
-    <h1>Sistema Solar 3D</h1>
+    <p class="app-title">Sistema Solar 3D</p>
     <p id="tel-target"></p>
     <div id="player" role="group" aria-label="Tempo da simulação">
       <button class="btn btn-icon" id="time-slow" title="Mais devagar" aria-label="Mais devagar">«</button>
@@ -32,6 +38,9 @@
     </button>
     <button class="btn" id="btn-overview" title="Voltar à visão geral (Esc)">
       <span class="lbl">Visão geral</span>
+    </button>
+    <button class="btn" id="btn-home" title="Voltar à abertura e restaurar o zoom inicial">
+      <span class="lbl">Início</span>
     </button>
     <button class="btn" id="btn-scale" title="Mostrar as distâncias na proporção real">
       <span class="lbl">Escala real</span>
@@ -102,6 +111,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="app.js?v=20261120d"></script>
+  <script src="app.js?v=20261123d"></script>
 </body>
 </html>
